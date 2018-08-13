@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"regexp"
 )
 
 //gopm get -g -v golang.org/x/net/html 可以自动识别HTML文本编码
@@ -30,7 +31,18 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("%s\n", bytes)
+	printCityListAll(bytes)
+	//fmt.Printf("%s\n", bytes)
+}
+func printCityListAll(bytes []byte) [][][]byte {
+	re := regexp.MustCompile(`<a href="(http://www.zhenai.com/zhenghun/[a-z0-9]+)[^>]*>([^<]+)</a>`)
+	match := re.FindAllSubmatch(bytes, -1)
+	for _, m := range match {
+		fmt.Printf("City:%s, \tURL:%s", m[2], m[1])
+		fmt.Printf("\n")
+	}
+	fmt.Printf("len(match):", len(match))
+	return match
 }
 
 // 根据传入的reader对象，返回对应的编码
